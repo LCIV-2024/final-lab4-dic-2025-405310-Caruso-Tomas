@@ -95,6 +95,8 @@ class GameServiceTest {
         assertEquals(7, result.getIntentosRestantes());
         assertTrue(result.getLetrasIntentadas().isEmpty());
         assertNotNull(result);
+        assertEquals("___________", result.getPalabraOculta());
+        assertEquals(0, result.getPuntajeAcumulado());
         verify(playerRepository, times(1)).findById(1L);
         verify(wordRepository, times(1)).findRandomWord();
     }

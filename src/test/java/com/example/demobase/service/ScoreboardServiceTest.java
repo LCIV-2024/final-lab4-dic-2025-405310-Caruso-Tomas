@@ -128,6 +128,7 @@ class ScoreboardServiceTest {
         assertEquals(2L, result.getPartidasGanadas());
         assertEquals(1L, result.getPartidasPerdidas());
         verify(playerRepository, times(1)).findById(1L);
+
     }
 
     @Test
