@@ -53,10 +53,50 @@ class GameServiceTest {
         word = new Word(1L, "PROGRAMADOR", false);
     }
 
+    /*   GameResponseDTO response = new GameResponseDTO();
+        // Validar que el jugador existe
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new HttpClientErrorException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Jugador no encontrado"));
+        // Verificar si ya existe una partida en curso para este jugador y palabra
+        Word word = wordRepository.findRandomWord().orElseThrow(()
+                -> new NoSuchElementException("Palabra disponible no encontrada")
+        );
+        Optional<GameInProgress> game = gameInProgressRepository.findByJugadorAndPalabra(playerId, word.getId());
+        if (game.isPresent()) {
+            return buildResponseFromGameInProgress(game.get());
+        }
+        // Marcar la palabra como utilizada
+        word.setUtilizada(true);
+        wordRepository.save(word);
+        // Crear nueva partida en curso
+        GameInProgress nuevaPartida = new GameInProgress();
+        nuevaPartida.setJugador(player);
+        nuevaPartida.setPalabra(word);
+        nuevaPartida.setLetrasIntentadas("");
+        nuevaPartida.setIntentosRestantes(MAX_INTENTOS);
+        nuevaPartida.setFechaInicio(LocalDateTime.now());
+        gameInProgressRepository.save(nuevaPartida);
+        // Construir respuesta
+        response = buildResponseFromGameInProgress(nuevaPartida);
+        return response;*/
     @Test
     void testStartGame_Success() {
-        // TODO: Implementar el test para testStartGame_Success
-        
+        when(wordRepository.findRandomWord()).thenReturn(Optional.of(word));
+        // : Implementar el test para testStartGame_Success
+        when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
+        when(gameInProgressRepository.findByJugadorAndPalabra(1L, word.getId())).thenReturn(Optional.empty());
+        when(gameInProgressRepository.save(any(GameInProgress.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(wordRepository.save(any(Word.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        GameResponseDTO result = gameService.startGame(1L);
+        assertEquals(7, result.getIntentosRestantes());
+        assertTrue(result.getLetrasIntentadas().isEmpty());
+        assertNotNull(result);
+        verify(playerRepository, times(1)).findById(1L);
+        verify(wordRepository, times(1)).findRandomWord();
     }
 
     @Test
@@ -119,7 +159,7 @@ class GameServiceTest {
 
         when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
         when(gameInProgressRepository.findByJugadorIdOrderByFechaInicioDesc(1L))
-                .thenReturn(Arrays.asList(gameInProgress));
+                .thenReturn(List.of(gameInProgress));
         when(gameInProgressRepository.save(any(GameInProgress.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
@@ -130,6 +170,7 @@ class GameServiceTest {
         assertTrue(result.getPalabraOculta().contains("P"));
         assertTrue(result.getLetrasIntentadas().contains('P'));
         verify(gameInProgressRepository, times(1)).save(any(GameInProgress.class));
+
     }
 
     @Test

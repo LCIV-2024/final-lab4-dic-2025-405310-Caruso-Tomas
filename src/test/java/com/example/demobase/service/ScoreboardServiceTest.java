@@ -107,10 +107,27 @@ class ScoreboardServiceTest {
         verify(gameRepository, times(1)).findByJugador(player2);
     }
 
+    /*public ScoreboardDTO getScoreboardByPlayer(Long playerId) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + playerId));
+        return calculatePlayerStats(player);
+    }
+    */
     @Test
     void testGetScoreboardByPlayer_Success() {
         // TODO: Implementar el test para testGetScoreboardByPlayer_Success
-        
+        when(playerRepository.findById(1L)).thenReturn(java.util.Optional.of(player1));
+        List<Game> games = Arrays.asList(game1, game2, game3);
+        when(gameRepository.findByJugador(player1)).thenReturn(games);
+        ScoreboardDTO result = scoreboardService.getScoreboardByPlayer(1L);
+        assertEquals(1L, result.getIdJugador());
+        assertEquals("Juan Pérez", result.getNombreJugador());
+        assertEquals(45, result.getPuntajeTotal());
+        assertNotNull(result);
+        assertEquals(3L, result.getPartidasJugadas());
+        assertEquals(2L, result.getPartidasGanadas());
+        assertEquals(1L, result.getPartidasPerdidas());
+        verify(playerRepository, times(1)).findById(1L);
     }
 
     @Test

@@ -1,1 +1,18 @@
 # TODO: Implementar el docker-compose.yml
+services:
+  examen:
+    container_name: final-405310
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - service-network
+    restart: on-failure
+    environment:
+      - SERVER_ERROR_INCLUDE_MESSAGE=always
+      - SERVER_ERROR_INCLUDE_BINDING_ERRORS=always
+networks:
+  service-network:
+    driver: bridge
