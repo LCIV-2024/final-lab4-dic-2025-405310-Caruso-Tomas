@@ -115,7 +115,7 @@ class ScoreboardServiceTest {
     */
     @Test
     void testGetScoreboardByPlayer_Success() {
-        // TODO: Implementar el test para testGetScoreboardByPlayer_Success
+        // : Implementar el test para testGetScoreboardByPlayer_Success
         when(playerRepository.findById(1L)).thenReturn(java.util.Optional.of(player1));
         List<Game> games = Arrays.asList(game1, game2, game3);
         when(gameRepository.findByJugador(player1)).thenReturn(games);

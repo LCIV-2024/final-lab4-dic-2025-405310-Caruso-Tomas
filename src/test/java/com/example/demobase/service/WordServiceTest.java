@@ -38,7 +38,7 @@ class WordServiceTest {
 
     @Test
     void testGetAllWords() {
-        // TODO: Implementar el test para getAllWords
+        // : Implementar el test para getAllWords
         List<Word> palabras = Arrays.asList(word1, word2, word3);
         when(wordRepository.findAllOrdered()).thenReturn(palabras);
         List<WordDTO> result = wordService.getAllWords();
@@ -55,7 +55,7 @@ class WordServiceTest {
 
     @Test
     void testGetAllWords_EmptyList() {
-        // TODO: Implementar el test para getAllWords_EmptyList
+        // : Implementar el test para getAllWords_EmptyList
         when(wordRepository.findAllOrdered()).thenReturn(List.of());
         List<WordDTO> result = wordService.getAllWords();
         assertNotNull(result);
