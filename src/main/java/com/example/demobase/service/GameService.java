@@ -36,12 +36,9 @@ public class GameService {
     @Transactional
     public GameResponseDTO startGame(Long playerId) {
         GameResponseDTO response = new GameResponseDTO();
-        // : Implementar el método startGame
-        // Validar que el jugador existe
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new HttpClientErrorException(
                         org.springframework.http.HttpStatus.NOT_FOUND, "No se encontrò el jugador "));
-        // Verificar si ya existe una partida en curso para este jugador y palabra
         Word word = wordRepository.findRandomWord().orElseThrow(()
                 -> new NoSuchElementException("No hay palabras disponibles")
         );
@@ -49,10 +46,8 @@ public class GameService {
         if (game.isPresent()) {
             return buildResponseFromGameInProgress(game.get());
         }
-        // Marcar la palabra como utilizada
         word.setUtilizada(true);
         wordRepository.save(word);
-        // Crear nueva partida en curso
         GameInProgress nuevaPartida = new GameInProgress();
         nuevaPartida.setJugador(player);
         nuevaPartida.setPalabra(word);
@@ -66,9 +61,8 @@ public class GameService {
     }
 
     @Transactional
-    // : Implementar el método makeGuess
+    // : Implementar el  makeGuess
     public GameResponseDTO makeGuess(Long playerId, Character letra) {
-        // Validar que el jugador existe
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new RuntimeException("jugador inexistente"));
         if(letra == null) {
@@ -92,29 +86,22 @@ public class GameService {
         if (letrasIntentadas.contains(letra)) {
             return buildResponseFromGameInProgress(game);
         }
-        // Agregar la nueva letra
         letrasIntentadas.add(letra);
         game.setLetrasIntentadas(charSetToString(letrasIntentadas));
-        // Verificar si la letra está en la palabra
-        // Decrementar intentos solo si la letra es incorrecta
         String palabraParaAdivinar = game.getPalabra().getPalabra().toUpperCase();
         if(!palabraParaAdivinar.contains(letra.toString())) {
             game.setIntentosRestantes(game.getIntentosRestantes()-1);
         }
-        // Generar palabra oculta
         String palabraOculta = generateHiddenWord(palabraParaAdivinar, letrasIntentadas);
-        // Guardar el estado actualizado
         gameInProgressRepository.save(game);
         GameResponseDTO response;
         response = buildResponseFromGameInProgress(game);
         boolean palabraCompletada = palabraOculta.equals(palabraParaAdivinar);
-        // Si el juego terminó, guardar en Game y eliminar de GameInProgress
         if (game.getIntentosRestantes()  == 0 || palabraCompletada) {
             int score = calculateScore(palabraParaAdivinar, letrasIntentadas, palabraCompletada, game.getIntentosRestantes());
             saveGame(game.getJugador(), game.getPalabra(), palabraCompletada, score);
             gameInProgressRepository.delete(game);
         }
-        // Construir respuesta
         return response;
     }
     
